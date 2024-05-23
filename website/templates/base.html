@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}FILMFAN{% endblock %}</title>
+    <style>
+        /* Navbar styles */
+        nav {
+            background-color: #333; /* Background color */
+        }
+        
+        nav a {
+            color: white; /* Text color */
+            text-decoration: none; /* Remove underline */
+            padding: 10px 20px; /* Padding */
+        }
+        
+        nav a:hover {
+            background-color: #555; /* Background color on hover */
+        }
+        
+        /* Optional: Center the navbar links horizontally */
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+        
+        /* Optional: Add some space between navbar links */
+        nav a {
+            margin: 0 10px;
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            <a href="{{ url_for('auth_bp.login')}}">Login</a>
+            <a href="{{ url_for('auth_bp.logout')}}">Logout</a>
+            <a href="{{ url_for('auth_bp.sign_up')}}">Sign Up</a>
+            <a href="{{ url_for('auth_bp.change_password')}}">Change your password</a>
+        </nav>
+    </header>
+    
+    {% block content %}
+    {% endblock %}
+    
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>

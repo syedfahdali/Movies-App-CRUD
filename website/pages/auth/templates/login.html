@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form method=post>
+  {{ form.hidden_tag() }}
+  <h3 align="center">Login</h3>
+  <dl>
+    {{ render_field(form.username, placeholder="Enter username", class="form-control") }}
+    {{ render_field(form.password, placeholder="Enter password", class="form-control") }}
+  </dl>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

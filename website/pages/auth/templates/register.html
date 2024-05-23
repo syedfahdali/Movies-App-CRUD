@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form method=post>
+  {{ form.hidden_tag() }}
+  <h3 align="center">Register a new user</h3>
+  <dl>
+    {{ render_field(form.username, placeholder="Enter username", class="form-control") }}
+    {{ render_field(form.first_name, placeholder="Enter first name", class="form-control") }}
+    {{ render_field(form.last_name, placeholder="Enter last name", class="form-control") }}
+    {{ render_field(form.password, placeholder="Enter password", class="form-control") }}
+    {{ render_field(form.confirm, placeholder="Confirm password", class="form-control") }}
+  </dl>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
