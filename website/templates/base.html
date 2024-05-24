@@ -29,7 +29,52 @@
         nav a {
             margin: 0 10px;
         }
-        
+        .container {
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-gap: 20px;
+            justify-content: center;
+        }
+
+        .movie-card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .movie-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .movie-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .movie-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 0;
+        }
+
+        button {
+            margin: 10px;
+        }
+
     </style>
 </head>
 <body>

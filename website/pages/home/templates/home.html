@@ -4,6 +4,20 @@
 <div class="container">
     <h1>WELCOME TO FILMFAN!</h1>
     <h2>Discover Dutch Films!</h2>
-    <h2>Your Movies</h2>
+    <button><a href="{{ url_for('API_bp.add_movie_form') }}" class="btn btn-primary">Add Movie</a></button>
+    <button><a href="{{ url_for('API_bp.delete_movie_page') }}" class="btn btn-danger">Delete Movie</a></button>
+
+    <div class="movie-grid">
+        {% for movie_id in movie_ids %}
+            {% set movie = get_movie_tile(movie_id) %}
+            {% if movie %}
+                <div class="movie-card">
+                    <img src="{{ movie.image_url }}" alt="{{ movie.name }} Image">
+                    <h3>{{ movie.name }}</h3>
+                    <p>ID: {{ movie.id }}</p>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

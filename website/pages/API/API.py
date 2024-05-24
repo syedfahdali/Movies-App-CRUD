@@ -1,7 +1,9 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 import logging
 from database.models import Movie, Category, db
-
+import os
+from werkzeug.utils import secure_filename
+UPLOAD_FOLDER = 'uploads'
 API_bp = Blueprint('API_bp', __name__,template_folder='templates')
 
 # Route to render the create movie form
@@ -32,6 +34,18 @@ def create_movie():
 
         # Create a new movie with the category's ID
         movie = Movie(category_id=category.id, movie_status=movie_status, name=movie_name)
+
+        # Handle image upload
+        if 'image' in request.files:
+            file = request.files['image']
+            if file.filename != '':
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(UPLOAD_FOLDER, filename))
+                movie.image_url = os.path.join(UPLOAD_FOLDER, filename)
+            else:
+                # If no image is selected, use default image
+                movie.image_url = url_for('static', filename='images/default_image.jpg')
+
         db.session.add(movie)
         db.session.commit()
 
@@ -83,3 +97,7 @@ def get_movie():
     except Exception as e:
         logging.exception(e)
         return {"error": "Internal Server Error"}, 500
+
+@API_bp.route('/delete_movie', methods=['GET'])
+def delete_movie_page():
+    return render_template('delete_movie.html')
