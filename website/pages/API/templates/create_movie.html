@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Add Movie{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Add a New Movie</h1>
+    <form method="POST" action="{{ url_for('API_bp.create_movie') }}">
+        <div class="mb-3">
+            <label for="movie_name" class="form-label">Movie Name</label>
+            <input type="text" class="form-control" id="movie_name" name="movie_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="category_name" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="category_name" name="category_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="movie_status" class="form-label">Movie Status</label>
+            <input type="text" class="form-control" id="movie_status" name="movie_status" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Movie</button>
+    </form>
+</div>
+{% endblock %}

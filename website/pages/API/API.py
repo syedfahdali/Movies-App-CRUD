@@ -1,48 +1,59 @@
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, render_template, redirect, url_for, flash
 import logging
 from database.models import Movie, Category, db
 
-API_bp = Blueprint('API_bp', __name__)
+API_bp = Blueprint('API_bp', __name__,template_folder='templates')
 
+# Route to render the create movie form
+@API_bp.route('/add_movie', methods=['GET'])
+def add_movie_form():
+    return render_template('create_movie.html')
 
-# test url: http://127.0.0.1/create_movie?movie_status=PreProduction&movie_name=test&category_name=test2
-@API_bp.route('/create_movie')
+# Route to create a new movie
+@API_bp.route('/create_movie', methods=['POST'])
 def create_movie():
     try:
-        movie_status = request.args["movie_status"]
-        movie_name = request.args["movie_name"]
-        category_name = request.args["category_name"]
+        movie_status = request.form.get("movie_status")
+        movie_name = request.form.get("movie_name")
+        category_name = request.form.get("category_name")
 
-        # .first() returns None if no row could be found with the provided arguments
+        if not movie_status or not movie_name or not category_name:
+            flash("All fields are required", "error")
+            return redirect(url_for('API_bp.add_movie_form'))
+
+        # Check if the category already exists
         category = db.session.query(Category).filter_by(name=category_name).first()
 
-        # if category does not exist create a new category
+        # If category does not exist, create a new category
         if category is None:
-            category_object = Category(name=category_name)
-            db.session.add(category_object)
+            category = Category(name=category_name)
+            db.session.add(category)
             db.session.commit()
 
-        # movie = Movie.create(category_id=category.id, movie_status=movie_status, name=movie_name)
-        movie_object = Movie(category_id=category.id, movie_status=movie_status, name=movie_name)
-        db.session.add(movie_object)
+        # Create a new movie with the category's ID
+        movie = Movie(category_id=category.id, movie_status=movie_status, name=movie_name)
+        db.session.add(movie)
         db.session.commit()
-        return {"response": f"movie added: {movie_object.name}"}
+
+        flash(f"Movie added: {movie.name}", "success")
+        return redirect(url_for('home_page_bp.home_page'))
     except Exception as e:
         logging.exception(e)
-        return {"response": "an error occurred"}
+        flash("An error occurred while adding the movie", "error")
+        return redirect(url_for('API_bp.add_movie_form'))
 
 
-# test url: http://127.0.0.1/get_movie?movie_id=1
-@API_bp.route('/get_movie')
-def get_movie():
+    
+@API_bp.route('/get_all_movies', methods=['GET'])
+def get_all_movies():
     try:
-        movie_id = int(request.args["movie_id"])
+        # Query all movies from the database
+        movies = db.session.query(Movie).all()
 
-        # there can only be one movie with a certain id so you can use .one() here. If no movie with this id exists it
-        # will still throw an error
-        movie = db.session.query(Movie).filter_by(id=movie_id).one()
+        # Extract the names of all movies
+        movie_names = [movie.name for movie in movies]
 
-        return {"movie": f"{movie.name}"}
+        return {"movies": movie_names}
     except Exception as e:
         logging.exception(e)
-        return {"movie": "Not found"}
+        return {"error": "Internal Server Error"}, 500
