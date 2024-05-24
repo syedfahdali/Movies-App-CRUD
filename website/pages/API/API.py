@@ -51,9 +51,35 @@ def get_all_movies():
         movies = db.session.query(Movie).all()
 
         # Extract the names of all movies
-        movie_names = [movie.name for movie in movies]
+        movie_list = [{"id": movie.id, "name": movie.name} for movie in movies]
+        return {"movies": movie_list}
+    except Exception as e:
+        logging.exception(e)
+        return {"error": "Internal Server Error"}, 500
 
-        return {"movies": movie_names}
+@API_bp.route('/get_movie', methods=['GET'])
+def get_movie():
+    try:
+        # Get the movie ID from the request arguments
+        movie_id = request.args.get("id")
+
+        # Check if the movie ID is provided
+        if movie_id is None:
+            return {"error": "Movie ID is missing"}, 400
+
+        # Convert movie ID to an integer
+        movie_id = int(movie_id)
+
+        # Query the movie from the database based on its ID
+        movie = db.session.query(Movie).filter_by(id=movie_id).first()
+
+        # Check if the movie exists
+        if movie:
+            return {"movie": {"name": movie.name, "id": movie.id}}
+        else:
+            return {"error": "Movie not found"}, 404
+    except ValueError:
+        return {"error": "Invalid movie ID"}, 400
     except Exception as e:
         logging.exception(e)
         return {"error": "Internal Server Error"}, 500
