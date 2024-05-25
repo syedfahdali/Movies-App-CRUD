@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Movie{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Delete a Movie</h1>
+    <form method="POST" action="{{ url_for('API_bp.delete_movie') }}">
+        <div class="mb-3">
+            <label for="movie_id" class="form-label">Movie ID</label>
+            <input type="number" class="form-control" id="movie_id" name="movie_id" required>
+        </div>
+        <button type="submit" class="btn btn-danger">Delete Movie</button>
+    </form>
+</div>
+{% endblock %}

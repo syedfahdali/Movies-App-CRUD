@@ -3,8 +3,9 @@ import logging
 from database.models import Movie, Category, db
 import os
 from werkzeug.utils import secure_filename
+
 UPLOAD_FOLDER = 'uploads'
-API_bp = Blueprint('API_bp', __name__,template_folder='templates')
+API_bp = Blueprint('API_bp', __name__, template_folder='templates')
 
 # Route to render the create movie form
 @API_bp.route('/add_movie', methods=['GET'])
@@ -15,11 +16,18 @@ def add_movie_form():
 @API_bp.route('/create_movie', methods=['POST'])
 def create_movie():
     try:
-        movie_status = request.form.get("movie_status")
-        movie_name = request.form.get("movie_name")
+        movie_title = request.form.get("movie_name")
+        director_first_name = request.form.get("director_first_name")
+        director_last_name = request.form.get("director_last_name")
+        year = request.form.get("year")
+        actors_first_name = request.form.get("actors_first_name")
+        actors_last_name = request.form.get("actors_last_name")
+        actor_role = request.form.get("actor_role")
         category_name = request.form.get("category_name")
+        movie_status = request.form.get("movie_status")
 
-        if not movie_status or not movie_name or not category_name:
+        # Check for all fields
+        if not all([movie_title, director_first_name, director_last_name, year, actors_first_name, actors_last_name, actor_role, category_name, movie_status]):
             flash("All fields are required", "error")
             return redirect(url_for('API_bp.add_movie_form'))
 
@@ -33,7 +41,17 @@ def create_movie():
             db.session.commit()
 
         # Create a new movie with the category's ID
-        movie = Movie(category_id=category.id, movie_status=movie_status, name=movie_name)
+        movie = Movie(
+            category_id=category.id,
+            movie_status=movie_status,
+            name=movie_title,
+            year=year,
+            director_first_name=director_first_name,
+            director_last_name=director_last_name,
+            actors_first_name=actors_first_name,
+            actors_last_name=actors_last_name,
+            actor_role=actor_role
+        )
 
         # Handle image upload
         if 'image' in request.files:
@@ -56,8 +74,42 @@ def create_movie():
         flash("An error occurred while adding the movie", "error")
         return redirect(url_for('API_bp.add_movie_form'))
 
+# Route to render the delete movie form
+@API_bp.route('/delete_movie', methods=['GET'])
+def delete_movie_page():
+    return render_template('delete_movie.html')
 
-    
+# Route to delete a movie
+@API_bp.route('/delete_movie', methods=['POST'])
+def delete_movie():
+    try:
+        movie_id = request.form.get("movie_id")
+
+        # Check if the movie ID is provided
+        if not movie_id:
+            flash("Movie ID is required", "error")
+            return redirect(url_for('API_bp.delete_movie_page'))
+
+        # Convert movie ID to an integer
+        movie_id = int(movie_id)
+
+        # Query the movie from the database based on its ID
+        movie = db.session.query(Movie).filter_by(id=movie_id).first()
+
+        # Check if the movie exists
+        if movie:
+            db.session.delete(movie)
+            db.session.commit()
+            flash(f"Movie with ID {movie_id} has been deleted", "success")
+        else:
+            flash("Movie not found", "error")
+
+        return redirect(url_for('home_page_bp.home_page'))
+    except Exception as e:
+        logging.exception(e)
+        flash("An error occurred while deleting the movie", "error")
+        return redirect(url_for('API_bp.delete_movie_page'))
+
 @API_bp.route('/get_all_movies', methods=['GET'])
 def get_all_movies():
     try:
@@ -97,7 +149,3 @@ def get_movie():
     except Exception as e:
         logging.exception(e)
         return {"error": "Internal Server Error"}, 500
-
-@API_bp.route('/delete_movie', methods=['GET'])
-def delete_movie_page():
-    return render_template('delete_movie.html')

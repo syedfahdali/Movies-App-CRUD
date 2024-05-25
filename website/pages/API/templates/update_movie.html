@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Update Movie{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Update Movie</h1>
+    <form method="POST" action="{{ url_for('API_bp.update_movie') }}" enctype="multipart/form-data">
+        <input type="hidden" name="movie_id" value="{{ movie.id }}">
+        <div class="mb-3">
+            <label for="movie_name" class="form-label">Movie Title</label>
+            <input type="text" class="form-control" id="movie_name" name="movie_name" value="{{ movie.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="director_first_name" class="form-label">Director First Name</label>
+            <input type="text" class="form-control" id="director_first_name" name="director_first_name" value="{{ movie.director_first_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="director_last_name" class="form-label">Director Last Name</label>
+            <input type="text" class="form-control" id="director_last_name" name="director_last_name" value="{{ movie.director_last_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="year" class="form-label">Year</label>
+            <input type="number" class="form-control" id="year" name="year" min="1900" max="2099" step="1" value="{{ movie.year }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="actors_first_name" class="form-label">Actor First Name</label>
+            <input type="text" class="form-control" id="actors_first_name" name="actors_first_name" value="{{ movie.actors_first_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="actors_last_name" class="form-label">Actor Last Name</label>
+            <input type="text" class="form-control" id="actors_last_name" name="actors_last_name" value="{{ movie.actors_last_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="actor_role" class="form-label">Actor Role</label>
+            <input type="text" class="form-control" id="actor_role" name="actor_role" value="{{ movie.actor_role }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="category_name" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="category_name" name="category_name" value="{{ movie.category.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Movie Image</label>
+            <input type="file" class="form-control" id="image" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Update Movie</button>
+    </form>
+</div>
+{% endblock %}
