@@ -207,21 +207,13 @@ def update_movie():
         return redirect(url_for('API_bp.update_movie'))
 
 @API_bp.route('/movie_details/<int:movie_id>', methods=['GET'])
-def movie_details():
+def movie_details(movie_id):
     try:
-        movie_id = request.args.get("movie_id")
-
-        # Check if the movie ID is provided
-        if movie_id is None:
-            return {"error": "Movie ID is missing"}, 400
-
-        # Convert movie ID to an integer
-        movie_id = int(movie_id)
         # Query the movie from the database based on its ID
-        movie = db.session.query(Movie).filter_by(movie_id).first()  # Fixed the .first() method, as .get() already retrieves the first result
-        category = db.session.query(Category).filter_by(movie_id).first()
+        movie = db.session.query(Movie).filter_by(id=movie_id).first()  # Assuming the column is 'id'
+        category = db.session.query(Category).filter_by(movie_id=movie_id).first()
 
-        # Check if the movie exists
+        # Check if the movie and category exist
         if movie and category:
             return render_template('movie_details.html', movie=movie, category=category)  # Pass movie and category variables to the template
         else:
