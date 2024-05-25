@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Movie Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ movie.name }}</h1>
+    <img src="{{ movie.image_url }}" alt="{{ movie.name }} Image">
+    <p><strong>Director:</strong> {{ movie.director_first_name }} {{ movie.director_last_name }}</p>
+    <p><strong>Year:</strong> {{ movie.year }}</p>
+    <p><strong>Actors:</strong> {{ movie.actors_first_name }} {{ movie.actors_last_name }}</p>
+    <p><strong>Actor Role:</strong> {{ movie.actor_role }}</p>
+    <p><strong>Category:</strong> {{ category.name }}</p>
+    <p><strong>Status:</strong> {{ movie.movie_status }}</p>
+    <a href="{{ url_for('API_bp.update_movie', movie_id=movie.id) }}" class="btn btn-primary">Update</a>
+    <a href="{{ url_for('API_bp.delete_movie_page', movie_id=movie.id) }}" class="btn btn-danger">Delete</a>
+</div>
+{% endblock %}

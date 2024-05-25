@@ -5,50 +5,50 @@
 {% block content %}
 <div class="container">
     <h1>Update Movie</h1>
-    <form method="POST" action="{{ url_for('API_bp.update_movie') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('API_bp.update_movie') }}">
         <div class="mb-3">
             <label for="movie_id" class="form-label">Movie ID</label>
-            <input type="number" class="form-control" id="movie_id" name="movie_id" required>
+            <input type="text" class="form-control" id="movie_id" name="movie_id" required>
         </div>
         <div class="mb-3">
             <label for="movie_name" class="form-label">Movie Title</label>
-            <input type="text" class="form-control" id="movie_name" name="movie_name" required>
+            <input type="text" class="form-control" id="movie_name" name="movie_name">
         </div>
         <div class="mb-3">
             <label for="director_first_name" class="form-label">Director First Name</label>
-            <input type="text" class="form-control" id="director_first_name" name="director_first_name" required>
+            <input type="text" class="form-control" id="director_first_name" name="director_first_name">
         </div>
         <div class="mb-3">
             <label for="director_last_name" class="form-label">Director Last Name</label>
-            <input type="text" class="form-control" id="director_last_name" name="director_last_name" required>
+            <input type="text" class="form-control" id="director_last_name" name="director_last_name">
         </div>
         <div class="mb-3">
             <label for="year" class="form-label">Year</label>
-            <input type="number" class="form-control" id="year" name="year" min="1900" max="2099" step="1" required>
+            <input type="number" class="form-control" id="year" name="year" min="1900" max="2099" step="1">
         </div>
         <div class="mb-3">
             <label for="actors_first_name" class="form-label">Actor First Name</label>
-            <input type="text" class="form-control" id="actors_first_name" name="actors_first_name" required>
+            <input type="text" class="form-control" id="actors_first_name" name="actors_first_name">
         </div>
         <div class="mb-3">
             <label for="actors_last_name" class="form-label">Actor Last Name</label>
-            <input type="text" class="form-control" id="actors_last_name" name="actors_last_name" required>
+            <input type="text" class="form-control" id="actors_last_name" name="actors_last_name">
         </div>
         <div class="mb-3">
             <label for="actor_role" class="form-label">Actor Role</label>
-            <input type="text" class="form-control" id="actor_role" name="actor_role" required>
+            <input type="text" class="form-control" id="actor_role" name="actor_role">
         </div>
         <div class="mb-3">
             <label for="category_name" class="form-label">Category Name</label>
-            <input type="text" class="form-control" id="category_name" name="category_name" required>
+            <input type="text" class="form-control" id="category_name" name="category_name">
         </div>
         <div class="mb-3">
             <label for="movie_status" class="form-label">Movie Status</label>
-            <input type="text" class="form-control" id="movie_status" name="movie_status" required>
+            <input type="text" class="form-control" id="movie_status" name="movie_status">
         </div>
         <div class="mb-3">
-            <label for="image" class="form-label">Movie Image</label>
-            <input type="file" class="form-control" id="image" name="image">
+            <label for="image_url" class="form-label">Image URL</label>
+            <input type="url" class="form-control" id="image_url" name="image_url">
         </div>
         <button type="submit" class="btn btn-primary">Update Movie</button>
     </form>

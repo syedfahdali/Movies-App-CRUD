@@ -5,75 +5,82 @@
     <title>{% block title %}FILMFAN{% endblock %}</title>
     <style>
         /* Navbar styles */
-        nav {
-            background-color: #333; /* Background color */
-        }
-        
-        nav a {
-            color: white; /* Text color */
-            text-decoration: none; /* Remove underline */
-            padding: 10px 20px; /* Padding */
-        }
-        
-        nav a:hover {
-            background-color: #555; /* Background color on hover */
-        }
-        
-        /* Optional: Center the navbar links horizontally */
-        nav {
-            display: flex;
-            justify-content: center;
-        }
-        
-        /* Optional: Add some space between navbar links */
-        nav a {
-            margin: 0 10px;
-        }
-        .container {
-            margin: 20px auto;
-            padding: 0 20px;
-        }
+       /* Navigation styles */
+nav {
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+}
 
-        h1, h2 {
-            text-align: center;
-        }
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin: 0 10px; /* Optional: Add some space between navbar links */
+}
 
-        .movie-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            grid-gap: 20px;
-            justify-content: center;
-        }
+nav a:hover {
+    background-color: #555;
+}
 
-        .movie-card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            text-align: center;
-        }
+/* Container styles */
+.container {
+    margin: 20px auto;
+    padding: 0 20px;
+}
 
-        .movie-card img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
+/* Heading styles */
+h1, h2 {
+    text-align: center;
+}
 
-        .movie-card h3 {
-            font-size: 1.2em;
-            margin-bottom: 5px;
-        }
+/* Movie grid styles */
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 20px;
+    justify-content: center;
+}
 
-        .movie-card p {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 0;
-        }
+/* Movie card styles */
+.movie-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+}
+.movie-grid :hover{
+    background-color: #b6b6b6;
+    transition:  500ms;
+}
 
-        button {
-            margin: 10px;
-        }
+/* Movie card image styles */
+.movie-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Movie card title styles */
+.movie-card h3 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+/* Movie card details styles */
+.movie-card p {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 0;
+}
+
+/* Button styles */
+button {
+    margin: 10px;
+}
+
 
     </style>
 </head>

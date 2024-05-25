@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <h1>Add a New Movie</h1>
-    <form method="POST" action="{{ url_for('API_bp.create_movie') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('API_bp.create_movie') }}">
         <div class="mb-3">
             <label for="movie_name" class="form-label">Movie Title</label>
             <input type="text" class="form-control" id="movie_name" name="movie_name" required>
@@ -43,8 +43,8 @@
             <input type="text" class="form-control" id="movie_status" name="movie_status" required>
         </div>
         <div class="mb-3">
-            <label for="image" class="form-label">Movie Image</label>
-            <input type="file" class="form-control" id="image" name="image">
+            <label for="image_url" class="form-label">Movie Image URL</label>
+            <input type="url" class="form-control" id="image_url" name="image_url">
         </div>
         <button type="submit" class="btn btn-primary">Add Movie</button>
     </form>

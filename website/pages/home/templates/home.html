@@ -13,9 +13,9 @@
             {% set movie = get_movie_tile(movie_id) %}
             {% if movie %}
                 <div class="movie-card">
-                    <img src="{{ movie.image_url }}" alt="{{ movie.name }} Image">
-                    <h3>{{ movie.name }}</h3>
-                    <p>ID: {{ movie.id }}</p>
+                    <img src="{{movie.image_url}}" alt="{{ movie.name }} Image">
+                    <h3>{{ movie.name }}</h3>   
+                    <p>ID: {{ movie_id }}</p>
                 </div>
             {% endif %}
         {% endfor %}

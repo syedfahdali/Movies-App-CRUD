@@ -41,7 +41,8 @@ def home_page():
             login_page=url_for('auth_bp.login'),
             logout_page=url_for('auth_bp.logout'),
             sign_up_page=url_for('auth_bp.sign_up'),
-            change_password_page=url_for('auth_bp.change_password')
+            change_password_page=url_for('auth_bp.change_password'),
+            
         )
         
     except TemplateNotFound:

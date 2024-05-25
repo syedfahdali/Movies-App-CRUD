@@ -25,9 +25,10 @@ def create_movie():
         actor_role = request.form.get("actor_role")
         category_name = request.form.get("category_name")
         movie_status = request.form.get("movie_status")
+        image_url = request.form.get("image_url")  # Add this line to get the image URL from the form
 
         # Check for all fields
-        if not all([movie_title, director_first_name, director_last_name, year, actors_first_name, actors_last_name, actor_role, category_name, movie_status]):
+        if not all([movie_title, director_first_name, director_last_name, year, actors_first_name, actors_last_name, actor_role, category_name, movie_status, image_url]):
             flash("All fields are required", "error")
             return redirect(url_for('API_bp.add_movie_form'))
 
@@ -50,19 +51,9 @@ def create_movie():
             director_last_name=director_last_name,
             actors_first_name=actors_first_name,
             actors_last_name=actors_last_name,
-            actor_role=actor_role
+            actor_role=actor_role,
+            image_url=image_url  # Assign the image URL directly to the movie object
         )
-
-        # Handle image upload
-        if 'image' in request.files:
-            file = request.files['image']
-            if file.filename != '':
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(UPLOAD_FOLDER, filename))
-                movie.image_url = os.path.join(UPLOAD_FOLDER, filename)
-            else:
-                # If no image is selected, use default image
-                movie.image_url = url_for('static', filename='images/default_image.jpg')
 
         db.session.add(movie)
         db.session.commit()
@@ -117,7 +108,7 @@ def get_all_movies():
         movies = db.session.query(Movie).all()
 
         # Extract the names of all movies
-        movie_list = [{"id": movie.id, "name": movie.name} for movie in movies]
+        movie_list = [{"id": movie.id, "name": movie.name, "image_url":movie.image_url} for movie in movies]
         return {"movies": movie_list}
     except Exception as e:
         logging.exception(e)
@@ -138,10 +129,24 @@ def get_movie():
 
         # Query the movie from the database based on its ID
         movie = db.session.query(Movie).filter_by(id=movie_id).first()
-
+        category= db.session.query(Category).filter_by(id=movie_id).first()
         # Check if the movie exists
-        if movie:
-            return {"movie": {"name": movie.name, "id": movie.id}}
+        if movie and category:
+            return {"movie": {
+                    "name": movie.name,
+                    "image_url": movie.image_url,
+                    "director_first_name": movie.director_first_name,
+                    "director_last_name": movie.director_last_name,
+                    "year": movie.year,
+                    "actors_first_name": movie.actors_first_name,
+                    "actors_last_name": movie.actors_last_name,
+                    "actor_role": movie.actor_role,
+                    "movie_status": movie.movie_status
+                },
+                "category":{
+                    "name": category.name
+                }
+                }
         else:
             return {"error": "Movie not found"}, 404
     except ValueError:
@@ -150,7 +155,6 @@ def get_movie():
         logging.exception(e)
         return {"error": "Internal Server Error"}, 500
 
-
 @API_bp.route('/update_movie', methods=['GET', 'POST'])
 def update_movie():
     if request.method == 'GET':
@@ -158,55 +162,40 @@ def update_movie():
     
     try:
         movie_id = request.form.get("movie_id")
-        movie_title = request.form.get("movie_name")
-        director_first_name = request.form.get("director_first_name")
-        director_last_name = request.form.get("director_last_name")
-        year = request.form.get("year")
-        actors_first_name = request.form.get("actors_first_name")
-        actors_last_name = request.form.get("actors_last_name")
-        actor_role = request.form.get("actor_role")
-        category_name = request.form.get("category_name")
-        movie_status = request.form.get("movie_status")
-
-        # Check for all fields
-        if not all([movie_id, movie_title, director_first_name, director_last_name, year, actors_first_name, actors_last_name, actor_role, category_name, movie_status]):
-            flash("All fields are required", "error")
-            return redirect(url_for('API_bp.update_movie'))
-
-        # Query the movie from the database based on its ID
         movie = db.session.query(Movie).filter_by(id=movie_id).first()
+
+        # Check if the movie exists
         if not movie:
             flash("Movie not found", "error")
             return redirect(url_for('API_bp.update_movie'))
 
-        # Update the movie details
-        movie.name = movie_title
-        movie.director_first_name = director_first_name
-        movie.director_last_name = director_last_name
-        movie.year = year
-        movie.actors_first_name = actors_first_name
-        movie.actors_last_name = actors_last_name
-        movie.actor_role = actor_role
-        movie.movie_status = movie_status
-
-        # Check if the category already exists
-        category = db.session.query(Category).filter_by(name=category_name).first()
-
-        # If category does not exist, create a new category
-        if category is None:
-            category = Category(name=category_name)
-            db.session.add(category)
-            db.session.commit()
-
-        movie.category_id = category.id
-
-        # Handle image upload
-        if 'image' in request.files:
-            file = request.files['image']
-            if file.filename != '':
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(UPLOAD_FOLDER, filename))
-                movie.image_url = os.path.join(UPLOAD_FOLDER, filename)
+        # Update the movie details if provided
+        if 'movie_name' in request.form:
+            movie.name = request.form.get("movie_name")
+        if 'director_first_name' in request.form:
+            movie.director_first_name = request.form.get("director_first_name")
+        if 'director_last_name' in request.form:
+            movie.director_last_name = request.form.get("director_last_name")
+        if 'year' in request.form:
+            movie.year = request.form.get("year")
+        if 'actors_first_name' in request.form:
+            movie.actors_first_name = request.form.get("actors_first_name")
+        if 'actors_last_name' in request.form:
+            movie.actors_last_name = request.form.get("actors_last_name")
+        if 'actor_role' in request.form:
+            movie.actor_role = request.form.get("actor_role")
+        if 'category_name' in request.form:
+            category_name = request.form.get("category_name")
+            category = db.session.query(Category).filter_by(name=category_name).first()
+            if category is None:
+                category = Category(name=category_name)
+                db.session.add(category)
+                db.session.commit()
+            movie.category_id = category.id
+        if 'movie_status' in request.form:
+            movie.movie_status = request.form.get("movie_status")
+        if 'image_url' in request.form:
+            movie.image_url = request.form.get("image_url")
 
         db.session.commit()
 
@@ -216,3 +205,29 @@ def update_movie():
         logging.exception(e)
         flash("An error occurred while updating the movie", "error")
         return redirect(url_for('API_bp.update_movie'))
+
+@API_bp.route('/movie_details/<int:movie_id>', methods=['GET'])
+def movie_details():
+    try:
+        movie_id = request.args.get("movie_id")
+
+        # Check if the movie ID is provided
+        if movie_id is None:
+            return {"error": "Movie ID is missing"}, 400
+
+        # Convert movie ID to an integer
+        movie_id = int(movie_id)
+        # Query the movie from the database based on its ID
+        movie = db.session.query(Movie).filter_by(movie_id).first()  # Fixed the .first() method, as .get() already retrieves the first result
+        category = db.session.query(Category).filter_by(movie_id).first()
+
+        # Check if the movie exists
+        if movie and category:
+            return render_template('movie_details.html', movie=movie, category=category)  # Pass movie and category variables to the template
+        else:
+            flash("Movie not found", "error")
+            return redirect(url_for('home_page_bp.home_page'))
+    except Exception as e:
+        logging.exception(e)
+        flash("An error occurred while retrieving movie details", "error")
+        return redirect(url_for('home_page_bp.home_page'))
