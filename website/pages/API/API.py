@@ -149,3 +149,70 @@ def get_movie():
     except Exception as e:
         logging.exception(e)
         return {"error": "Internal Server Error"}, 500
+
+
+@API_bp.route('/update_movie', methods=['GET', 'POST'])
+def update_movie():
+    if request.method == 'GET':
+        return render_template('update_movie.html')
+    
+    try:
+        movie_id = request.form.get("movie_id")
+        movie_title = request.form.get("movie_name")
+        director_first_name = request.form.get("director_first_name")
+        director_last_name = request.form.get("director_last_name")
+        year = request.form.get("year")
+        actors_first_name = request.form.get("actors_first_name")
+        actors_last_name = request.form.get("actors_last_name")
+        actor_role = request.form.get("actor_role")
+        category_name = request.form.get("category_name")
+        movie_status = request.form.get("movie_status")
+
+        # Check for all fields
+        if not all([movie_id, movie_title, director_first_name, director_last_name, year, actors_first_name, actors_last_name, actor_role, category_name, movie_status]):
+            flash("All fields are required", "error")
+            return redirect(url_for('API_bp.update_movie'))
+
+        # Query the movie from the database based on its ID
+        movie = db.session.query(Movie).filter_by(id=movie_id).first()
+        if not movie:
+            flash("Movie not found", "error")
+            return redirect(url_for('API_bp.update_movie'))
+
+        # Update the movie details
+        movie.name = movie_title
+        movie.director_first_name = director_first_name
+        movie.director_last_name = director_last_name
+        movie.year = year
+        movie.actors_first_name = actors_first_name
+        movie.actors_last_name = actors_last_name
+        movie.actor_role = actor_role
+        movie.movie_status = movie_status
+
+        # Check if the category already exists
+        category = db.session.query(Category).filter_by(name=category_name).first()
+
+        # If category does not exist, create a new category
+        if category is None:
+            category = Category(name=category_name)
+            db.session.add(category)
+            db.session.commit()
+
+        movie.category_id = category.id
+
+        # Handle image upload
+        if 'image' in request.files:
+            file = request.files['image']
+            if file.filename != '':
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(UPLOAD_FOLDER, filename))
+                movie.image_url = os.path.join(UPLOAD_FOLDER, filename)
+
+        db.session.commit()
+
+        flash(f"Movie updated: {movie.name}", "success")
+        return redirect(url_for('home_page_bp.home_page'))
+    except Exception as e:
+        logging.exception(e)
+        flash("An error occurred while updating the movie", "error")
+        return redirect(url_for('API_bp.update_movie'))
