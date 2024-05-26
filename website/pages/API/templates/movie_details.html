@@ -1,8 +1,104 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
 
-{% block title %}Movie Details{% endblock %}
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-{% block content %}
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin: 0 auto 20px auto;
+        }
+
+        p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            color: #fff;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #3caea3;
+            border: none;
+        }
+
+        .btn-danger {
+            background-color: #ff6b6b;
+            border: none;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .review-section {
+            margin-top: 40px;
+        }
+
+        .review-form textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            resize: none;
+        }
+
+        .review-list .review-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .review-list .review-author {
+            font-weight: bold;
+        }
+
+        .review-list .review-content {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
 <div class="container">
     <h1>{{ movie.name }}</h1>
     <img src="{{ movie.image_url }}" alt="{{ movie.name }} Image">
@@ -14,5 +110,102 @@
     <p><strong>Status:</strong> {{ movie.movie_status }}</p>
     <a href="{{ url_for('API_bp.update_movie', movie_id=movie.id) }}" class="btn btn-primary">Update</a>
     <a href="{{ url_for('API_bp.delete_movie_page', movie_id=movie.id) }}" class="btn btn-danger">Delete</a>
+
+    <div class="review-section">
+        {% if current_user.is_authenticated %}
+        <div class="review-form">
+            <h3>Add a Review</h3>
+            <form id="review-form">
+                <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                <textarea id="review-content" placeholder="Enter your review" required></textarea>
+                <button type="submit" class="btn btn-primary mt-2">Submit Review</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="review-list">
+            <h3>Reviews</h3>
+            {% for review in reviews %}
+            <div class="review-item">
+                <div class="review-author">{{ review.user.username }}</div>
+                <div class="review-content">{{ review.content }}</div>
+                {% if current_user.is_authenticated and current_user.id == review.user.id %}
+                <form id="delete-review-form-{{ review.id }}" method="post" style="display:inline;">
+                    <input type="hidden" name="review_id" value="{{ review.id }}">
+                    <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
-{% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('review-form');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = {
+                user_id: form.elements['user_id'].value,
+                movie_id: form.elements['movie_id'].value,
+                content: document.getElementById('review-content').value
+            };
+
+            try {
+                const response = await fetch('{{ url_for("API_bp.submit_review") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to submit review');
+                }
+
+                window.location.reload(); // Reload the page after successful submission
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                // Handle error if necessary
+            }
+        });
+
+        const deleteForms = document.querySelectorAll('[id^="delete-review-form-"]');
+
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(form);
+                const reviewId = formData.get('review_id');
+
+                try {
+                    const response = await fetch('{{ url_for("API_bp.delete_review") }}?review_id=' + reviewId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ review_id: reviewId })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete review');
+                    }
+
+                    window.location.reload(); // Reload the page after successful deletion
+                } catch (error) {
+                    console.error('Error deleting review:', error);
+                    // Handle error if necessary
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,8 +1,9 @@
-from flask import Blueprint, request, render_template, redirect, url_for, flash
+from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify
 import logging
-from database.models import Movie, Category, db
+from database.models import Movie, Category, db,Review
 import os
 from werkzeug.utils import secure_filename
+from flask_login import login_required, current_user
 
 UPLOAD_FOLDER = 'uploads'
 API_bp = Blueprint('API_bp', __name__, template_folder='templates')
@@ -217,9 +218,10 @@ def movie_details():
         
         movie = db.session.query(Movie).filter_by(id=movie_id).first()
         category = db.session.query(Category).filter_by(id=movie_id).first()
-        
+        reviews = Review.query.filter_by(movie_id=movie_id).all()
+
         if movie and category:
-            return render_template('movie_details.html', movie=movie, category=category)
+            return render_template('movie_details.html', movie=movie, category=category, reviews=reviews)
         else:
             flash("Movie not found", "error")
             return redirect(url_for('home_page_bp.home_page'))
@@ -232,3 +234,54 @@ def movie_details():
 
 
 
+@API_bp.route('/submit_review', methods=['POST'])
+def submit_review():
+    # Check if the request content type is JSON
+    if request.headers['Content-Type'] != 'application/json':
+        return jsonify({"error": "Content-Type must be 'application/json'"}), 415
+
+    # Get JSON data from the request
+    data = request.json
+
+    # Extract user_id, movie_id, and content from the JSON data
+    user_id = data.get('user_id')
+    movie_id = data.get('movie_id')
+    content = data.get('content')
+
+    # Check if all fields are provided
+    if not user_id or not movie_id or not content:
+        return jsonify({"error": "All fields are required"}), 400
+
+    # Create and add the review to the database
+    review = Review(user_id=user_id, movie_id=movie_id, content=content)
+    db.session.add(review)
+    db.session.commit()
+
+    # Redirect to the movie details page
+    return redirect(url_for('API_bp.movie_details', movie_id=movie_id))
+
+
+
+@API_bp.route('/delete_review', methods=['POST'])
+def delete_review():
+    review_id = request.args.get("review_id")
+
+    # Check if the review ID is provided
+    if review_id is None:
+        return {"error": "Review ID is missing"}, 400
+
+    # Convert review ID to an integer
+    review_id = int(review_id)
+    review = Review.query.get_or_404(review_id)
+
+    # Perform authorization check
+    if review.user_id != current_user.id:
+        return jsonify({"error": "You do not have permission to delete this review"}), 403
+
+    # Delete the review from the database
+    db.session.delete(review)
+    db.session.commit()
+
+    # Redirect to the movie details page
+    return redirect(url_for('API_bp.movie_details', movie_id=review.movie_id))
+    return redirect(url_for('API_bp.movie_details', movie_id=review.movie_id))
