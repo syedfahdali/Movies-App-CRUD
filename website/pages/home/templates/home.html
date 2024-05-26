@@ -16,7 +16,9 @@
                     <img src="{{ movie.image_url }}" alt="{{ movie.name }} Image">
                     <h3>{{ movie.name }}</h3>   
                     <p>ID: {{ movie_id }}</p>
-                    <button class="btn btn-primary"><a href="{{ url_for('API_bp.movie_details', movie_id=movie_id) }}" class="text-white">Details</a></button>
+                    <button class="btn btn-primary">
+                        <a href="{{ url_for('API_bp.movie_details', id=movie_id) }}" class="text-white">Details</a>
+                    </button>
                 </div>
             {% endif %}
         {% endfor %}

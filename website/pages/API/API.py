@@ -205,21 +205,30 @@ def update_movie():
         logging.exception(e)
         flash("An error occurred while updating the movie", "error")
         return redirect(url_for('API_bp.update_movie'))
-
-@API_bp.route('/movie_details/<int:movie_id>', methods=['GET'])
-def movie_details(movie_id):
+@API_bp.route('/movie_details', methods=['GET'])
+def movie_details():
     try:
-        # Query the movie from the database based on its ID
-        movie = db.session.query(Movie).filter_by(id=movie_id).first()  # Assuming the column is 'id'
-        category = db.session.query(Category).filter_by(movie_id=movie_id).first()
-
-        # Check if the movie and category exist
+        movie_id = request.args.get("id")
+        if movie_id is None:
+            return {"error": "Movie ID is missing"}, 400
+        
+        # Convert movie_id to an integer
+        movie_id = int(movie_id)
+        
+        movie = db.session.query(Movie).filter_by(id=movie_id).first()
+        category = db.session.query(Category).filter_by(id=movie_id).first()
+        
         if movie and category:
-            return render_template('movie_details.html', movie=movie, category=category)  # Pass movie and category variables to the template
+            return render_template('movie_details.html', movie=movie, category=category)
         else:
             flash("Movie not found", "error")
             return redirect(url_for('home_page_bp.home_page'))
+    except ValueError:
+        return {"error": "Invalid movie ID"}, 400
     except Exception as e:
         logging.exception(e)
         flash("An error occurred while retrieving movie details", "error")
         return redirect(url_for('home_page_bp.home_page'))
+
+
+
