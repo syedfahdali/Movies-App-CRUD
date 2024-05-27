@@ -131,7 +131,7 @@
                 <div class="review-author">{{ review.user.username }}</div>
                 <div class="review-content">{{ review.content }}</div>
                 {% if current_user.is_authenticated and current_user.id == review.user.id %}
-                <form id="delete-review-form-{{ review.id }}" method="post" style="display:inline;">
+                <form id="delete-review-form-{{ review.id }}" method="post" action="{{ url_for('API_bp.delete_review') }}" style="display:inline;">
                     <input type="hidden" name="review_id" value="{{ review.id }}">
                     <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
                 </form>
@@ -185,7 +185,7 @@
                 const reviewId = formData.get('review_id');
 
                 try {
-                    const response = await fetch('{{ url_for("API_bp.delete_review") }}', {
+                    const response = await fetch(form.action, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

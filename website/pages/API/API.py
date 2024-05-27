@@ -235,28 +235,26 @@ def submit_review():
 
 
 @API_bp.route('/delete_review', methods=['POST'])
+@login_required
 def delete_review():
-    review_id = request.args.get("review_id")
+    try:
+        review_id = request.json.get("review_id")
 
-    # Check if the review ID is provided
-    if review_id is None:
-        return {"error": "Review ID is missing"}, 400
+        if not review_id:
+            return jsonify({"error": "Review ID is required"}), 400
 
-    # Convert review ID to an integer
-    review_id = int(review_id)
-    review = Review.query.get_or_404(review_id)
+        review_id = int(review_id)
+        review = Review.query.get(review_id)
 
-    # Perform authorization check
-    if review.user_id != current_user.id:
-        return jsonify({"error": "You do not have permission to delete this review"}), 403
+        if review and review.user_id == current_user.id:
+            db.session.delete(review)
+            db.session.commit()
+            return jsonify({"message": "Review deleted successfully"}), 200
+        else:
+            return jsonify({"error": "Review not found or you do not have permission to delete this review"}), 404
+    except Exception as e:
+        return jsonify({"error": "An error occurred while deleting the review"}), 500
 
-    # Delete the review from the database
-    db.session.delete(review)
-    db.session.commit()
-
-    # Redirect to the movie details page
-    return redirect(url_for('API_bp.movie_details', movie_id=review.movie_id))
-    return redirect(url_for('API_bp.movie_details', movie_id=review.movie_id))
 
 
 @API_bp.route('/delete_movie', methods=['POST'])
