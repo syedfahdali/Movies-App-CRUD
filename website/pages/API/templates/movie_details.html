@@ -109,7 +109,7 @@
     <p><strong>Category:</strong> {{ category.name }}</p>
     <p><strong>Status:</strong> {{ movie.movie_status }}</p>
     <a href="{{ url_for('API_bp.update_movie', movie_id=movie.id) }}" class="btn btn-primary">Update</a>
-    <a href="{{ url_for('API_bp.delete_movie_page', movie_id=movie.id) }}" class="btn btn-danger">Delete</a>
+    <a href="{{ url_for('API_bp.delete_movie', movie_id=movie.id) }}" class="btn btn-danger">Delete</a>
 
     <div class="review-section">
         {% if current_user.is_authenticated %}
@@ -185,7 +185,7 @@
                 const reviewId = formData.get('review_id');
 
                 try {
-                    const response = await fetch('{{ url_for("API_bp.delete_review") }}?review_id=' + reviewId, {
+                    const response = await fetch('{{ url_for("API_bp.delete_review") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

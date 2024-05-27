@@ -6,7 +6,7 @@
     <h2>Discover Dutch Films!</h2>
     <button><a href="{{ url_for('API_bp.add_movie_form') }}" class="btn btn-primary">Add Movie</a></button>
     <button><a href="{{ url_for('API_bp.update_movie') }}" class="btn btn-primary">Update Movie</a></button>    
-    <button><a href="{{ url_for('API_bp.delete_movie_page') }}" class="btn btn-danger">Delete Movie</a></button>
+    <button><a href="{{ url_for('API_bp.delete_movie') }}" class="btn btn-danger">Delete Movie</a></button>
 
     <div class="movie-grid">
         {% for movie_id in movie_ids %}

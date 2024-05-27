@@ -72,35 +72,7 @@ def delete_movie_page():
     return render_template('delete_movie.html')
 
 # Route to delete a movie
-@API_bp.route('/delete_movie', methods=['POST'])
-def delete_movie():
-    try:
-        movie_id = request.form.get("movie_id")
 
-        # Check if the movie ID is provided
-        if not movie_id:
-            flash("Movie ID is required", "error")
-            return redirect(url_for('API_bp.delete_movie_page'))
-
-        # Convert movie ID to an integer
-        movie_id = int(movie_id)
-
-        # Query the movie from the database based on its ID
-        movie = db.session.query(Movie).filter_by(id=movie_id).first()
-
-        # Check if the movie exists
-        if movie:
-            db.session.delete(movie)
-            db.session.commit()
-            flash(f"Movie with ID {movie_id} has been deleted", "success")
-        else:
-            flash("Movie not found", "error")
-
-        return redirect(url_for('home_page_bp.home_page'))
-    except Exception as e:
-        logging.exception(e)
-        flash("An error occurred while deleting the movie", "error")
-        return redirect(url_for('API_bp.delete_movie_page'))
 
 @API_bp.route('/get_all_movies', methods=['GET'])
 def get_all_movies():
@@ -285,3 +257,34 @@ def delete_review():
     # Redirect to the movie details page
     return redirect(url_for('API_bp.movie_details', movie_id=review.movie_id))
     return redirect(url_for('API_bp.movie_details', movie_id=review.movie_id))
+
+
+@API_bp.route('/delete_movie', methods=['POST'])
+def delete_movie():
+    try:
+        movie_id = request.form.get("movie_id")
+
+        # Check if the movie ID is provided
+        if not movie_id:
+            flash("Movie ID is required", "error")
+            return redirect(url_for('API_bp.delete_movie_page'))
+
+        # Convert movie ID to an integer
+        movie_id = int(movie_id)
+
+        # Query the movie from the database based on its ID
+        movie = db.session.query(Movie).filter_by(id=movie_id).first()
+
+        # Check if the movie exists
+        if movie:
+            db.session.delete(movie)
+            db.session.commit()
+            flash(f"Movie with ID {movie_id} has been deleted", "success")
+        else:
+            flash("Movie not found", "error")
+
+        return redirect(url_for('home_page_bp.home_page'))
+    except Exception as e:
+        logging.exception(e)
+        flash("An error occurred while deleting the movie", "error")
+        return redirect(url_for('API_bp.delete_movie_page'))
